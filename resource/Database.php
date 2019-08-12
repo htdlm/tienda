@@ -2,9 +2,9 @@
 
 //Conexión usando base de datos
 
-/*
+
 $username = 'root';
-$dsn = 'mysql:host=localhost; dbname=register';
+$dsn = 'mysql:host=localhost; dbname=bd';
 $password = '';
 
 try{
@@ -17,10 +17,9 @@ try{
     echo "Fallo la conexión ".$ex->getMessage();
 }
 
-*/
 
 //Conexión usando archivo plano
 
 
-$password_file = "pass.txt";
+//$password_file = "pass.txt";
 

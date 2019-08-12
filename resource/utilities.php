@@ -1,18 +1,5 @@
 <?php
 
-function check_empty_fields($required_fields_array){
-    //Inicializa arreglo para guardar los errores
-    $form_errors = array();
-
-    //loop en el arreglo despliega la lista de errores
-    foreach($required_fields_array as $name_of_field){
-        if(!isset($_POST[$name_of_field]) || $_POST[$name_of_field] == NULL){
-            $form_errors[] = $name_of_field . " es campo requerido";
-        }
-    }
-
-    return $form_errors;
-}
 
 function check_min_length($fields_to_check_length){
     //Inicializa arreglo para guardar los errores
@@ -24,40 +11,6 @@ function check_min_length($fields_to_check_length){
         }
     }
     return $form_errors;
-}
-
-function check_email($data){
-    //Inicializa arreglo para guardar los errores
-    $form_errors = array();
-    $key = 'email';
-    //Valida email
-    if(array_key_exists($key, $data)){
-
-        //email tiene algo
-        if($_POST[$key] != null){
-
-            // Quita lo que no sirve del mail
-            $key = filter_var($key, FILTER_SANITIZE_EMAIL);
-
-            //Valida si el mail es valido
-            if(filter_var($_POST[$key], FILTER_VALIDATE_EMAIL) === false){
-                $form_errors[] = $key . " No es una dirección válida de correo";
-            }
-        }
-    }
-    return $form_errors;
-}
-
-
-function show_errors($form_errors_array){
-    $errors = "<p><ul style='color: red;'>";
-
-    //loop en el arreglo despliega la lista de errores
-    foreach($form_errors_array as $the_error){
-        $errors .= "<li> {$the_error} </li>";
-    }
-    $errors .= "</ul></p>";
-    return $errors;
 }
 
 
@@ -108,4 +61,15 @@ function check_pass($login, $password) {
 
 
 
-
+function abortar(){
+    echo "Quieres salir? escribe si para continuar: ";
+    $handle = fopen ("php://stdin","r");
+    $line = fgets($handle);
+    if(trim($line) != 'si'){
+        echo "Saliendo!\n";
+        exit;
+    }
+    fclose($handle);
+    echo "\n";
+    echo "ok continuamos...\n";
+}

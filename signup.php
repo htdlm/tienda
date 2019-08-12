@@ -1,100 +1,91 @@
 <?php
-//Permite la conexión de la Base de Datos o el Archivo Plano
+include_once 'resource/session.php';
 include_once 'resource/Database.php';
 include_once 'resource/utilities.php';
+include_once 'include/cabeza.php';
 
-//Procesa el formato
 if(isset($_POST['signupBtn'])){
-    //Inicializa el arreglo de errores
-    $form_errors = array();
 
-    //Valida el formato
-    $required_fields = array('email', 'username', 'password');
-
-    //Llama a la función para ver si no hay campos vacíos
-    $form_errors = array_merge($form_errors, check_empty_fields($required_fields));
-
-    //Longitud mínima de campos
-    $fields_to_check_length = array('username' => 4, 'password' => 6);
-
-    //Llama a la función para validar longitud mínima
-    $form_errors = array_merge($form_errors, check_min_length($fields_to_check_length));
-
-    //Validación del email
-    $form_errors = array_merge($form_errors, check_email($_POST));
-
-    //Valida si no hay errores
-    if(empty($form_errors)){
-        //Lee datos
-        $email = $_POST['email'];
-        $username = $_POST['username'];
-        $password = $_POST['password'];
-
-        //encripta el password con sha1
+        $email = $_POST['upemail'];
+        $username = $_POST['upname'];
+        $password = $_POST['uppassword'];
+        $phone = $_POST['upphone'];
 
         $hashed_password = sha1($password);
 
         //Con Archivos Planos
 
-        add_user($username,$password,$email);
-
-        /*   CON BASE DE DATOS
+        //add_user($username,$password,$email);
 
         try{
 
-            //create SQL insert statement
-            $sqlInsert = "INSERT INTO users (username, email, password, join_date)
-              VALUES (:username, :email, :password, now())";
+            $sqlInsert = "INSERT INTO users (username, email, phone, password, join_date)
+              VALUES (:username, :email, :phone, :password, now())";
 
             //Usa PDO
             $statement = $db->prepare($sqlInsert);
 
-            //Agrega Datos en la BD
-            $statement->execute(array(':username' => $username, ':email' => $email, ':password' => $hashed_password));
+            $statement->execute(array(':username' => $username, ':email' => $email, ':phone' => $phone, ':password' => $hashed_password));
 
             //Valida si el registro se creo
             if($statement->rowCount() == 1){
-                $result = "<p style='padding:20px; border: 1px solid gray; color: green;'> Registrado correctamente</p>";
+                echo "<script> swal({title: '¡Listo!',text: 'Usuario Registrado',type: 'success',});</script>";
+                print "<meta http-equiv=Refresh content=\"2 ; url=index.php\">";
             }
         }catch (PDOException $ex){
-            $result = "<p style='padding:20px; border: 1px solid gray; color: red;'> Ocurrio un error: ".$ex->getMessage()."</p>";
+            echo "<script> swal({title: '¡ERROR!',text: 'El usuario no pudo ser agregado' ,type: 'error',});</script>";
         }
-
-        */
-
-    }
-    else{
-        if(count($form_errors) == 1){
-            $result = "<p style='color: red;'> Hay un error en el formato<br>";
-        }else{
-            $result = "<p style='color: red;'> Hay " .count($form_errors). " errores <br>";
-        }
-    }
-
 }
 
 ?>
+
 <!DOCTYPE html>
-<html>
-<head lang="en">
-    <meta charset="UTF-8">
-    <title>Register Page</title>
-</head>
+<html lang="en">
 <body>
-<h2>UNIR Proyecto 1 Autentificación de usuarios </h2><hr>
 
-<h3>Forma de Registro</h3>
+<div class="hero-wrap hero-bread" style="background-image: url('images/fondo.jpg');">
+    <div class="container">
+        <div class="row no-gutters slider-text align-items-center justify-content-center">
+            <div class="col-md-9 ftco-animate text-center">
+                <h1 class="mb-0 bread">Registrar</h1>
+            </div>
+        </div>
+    </div>
+</div>
 
-<?php if(isset($result)) echo $result; ?>
-<?php if(!empty($form_errors)) echo show_errors($form_errors); ?>
-<form method="post" action="">
-    <table>
-        <tr><td>Email:</td> <td><input type="text" value="" name="email"></td></tr>
-        <tr><td>Username:</td> <td><input type="text" value="" name="username"></td></tr>
-        <tr><td>Password:</td> <td><input type="password" value="" name="password"></td></tr>
-        <tr><td></td><td><input style="float: right;" type="submit" name="signupBtn" value="Entrar"></td></tr>
-    </table>
-</form>
-<p><a href="index.php">Regresar</a> </p>
+
+<section class ="ftco-section signup-section bg-light mx-auto order-md-last d-flex justify-content-center">
+    <form method="POST" action="" class="bg-white p-5 form-signup">
+        <div class="container">
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <span class="icon-envelope">
+                    <label for="inputEmail4">Email</label>
+                    <input type="email" name= "upemail" class="form-control" id="inputEmail4" placeholder="Email" required>
+                </div>
+                <div class="form-group col-md-6">
+                    <span class="icon-key">
+                    <label for="inputPassword4">Password</label>
+                    <input type="password" name="uppassword" class="form-control" id="inputPassword4" placeholder="Password" required>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-10">
+                    <span class="icon-user">
+                    <label for="inputName">Nombre</label>
+                    <input type="text" name= "upname" class="form-control" id="inputName" placeholder="Juan Pérez" required>
+                </div>
+                <div class="form-group col-md-10">
+                    <span class="icon-phone2">
+                    <label for="inputPhone">Teléfono</label>
+                    <input type="tel" name="upphone" class="form-control" id="inputPhone" placeholder="+52 5510101010" required>
+                </div>
+            </div>
+        <button type="submit" name="signupBtn" class="btn btn-primary">Registrar</button>
+        <form>
+</section>
+
+<?php include_once 'include/pie.php'; ?>
+
 </body>
 </html>

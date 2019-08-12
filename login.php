@@ -2,83 +2,90 @@
 include_once 'resource/session.php';
 include_once 'resource/Database.php';
 include_once 'resource/utilities.php';
+include_once 'include/cabeza.php';
 
 if(isset($_POST['loginBtn'])) {
-    //array to hold errors
-    $form_errors = array();
 
-//validate
-    $required_fields = array('username', 'password');
-    $form_errors = array_merge($form_errors, check_empty_fields($required_fields));
+    $email = $_POST['email'];
+    $password = $_POST['password'];
+    $hashed_password = sha1($password);
 
-    if (empty($form_errors)) {
+    $sqlQuery = "SELECT * FROM users WHERE email = :email and password = :password";
+    $statement = $db->prepare($sqlQuery);
+    $statement->execute(array(':email' => $email, ':password' => $hashed_password));
 
-        //collect form data
-        $user = $_POST['username'];
-        $password = $_POST['password'];
+    if ($statement->rowCount() > 0) {
 
-
-        /* BASE DE DATOS
-
-        //Valida si el usuario existe en la base de datos
-        $sqlQuery = "SELECT * FROM users WHERE username = :username";
-        $statement = $db->prepare($sqlQuery);
-        $statement->execute(array(':username' => $user));
-
-       while($row = $statement->fetch()){
-           $id = $row['id'];
-           $hashed_password = $row['password'];
-           $username = $row['username'];
-
-           if(sha1($password) == $hashed_password){
-               $_SESSION['id'] = $id;
-               $_SESSION['username'] = $username;
-               header("location: index.php");
-           }else{
-               $result = "<p style='padding: 20px; color: red; border: 1px solid gray;'> Invalid username or password</p>";
-           }
-       }
-
-         Fin de BASE DE DATOS  */
-
-        if (check_pass($user, $password) == 1) {
-            $_SESSION['id'] = $id;
-            $_SESSION['username'] = $username;
-            header("location: added.php");
-        } else {
-            $result = "<p style='padding: 20px; color: red; border: 1px solid gray;'> Usuario o password inválido</p>";
-        }
+        $row = $statement->fetch();
+        $id = $row["id"];
+        $username = $row["username"];
+        $_SESSION['id'] = $id;
+        $_SESSION['email'] = $email;
+        $_SESSION['username'] = $username;
+        echo "<script> swal({title: '¡Bienvenido!',text: 'Acceso Correcto',type: 'success',});</script>";
+        print "<meta http-equiv=Refresh content=\"2 ; url=index.php\">";
     } else {
-        if (count($form_errors) == 1) {
-            $result = "<p style='color: red;'>Hay un error en la forma </p>";
-        } else {
-            $result = "<p style='color: red;'>Hay  " . count($form_errors) . " errores en la forma </p>";
-        }
+        echo "<script> swal({title: '¡ERROR!',text: 'Email o Password Incorrecto',type: 'error',});</script>";
     }
 }
 ?>
 
 <!DOCTYPE html>
-<html>
-<head lang="en">
-    <meta charset="UTF-8">
-    <title>Login Page</title>
-</head>
+<html lang="en">
 <body>
-<h2>UNIR Proyecto 1 Autentificación de usuarios </h2><hr>
 
-<h3>Forma de login</h3>
+<div class="hero-wrap hero-bread" style="background-image: url('images/fondo.jpg');">
+    <div class="container">
+        <div class="row no-gutters slider-text align-items-center justify-content-center">
+            <div class="col-md-9 ftco-animate text-center">
+                <h1 class="mb-0 bread">Login</h1>
+            </div>
+        </div>
+    </div>
+</div>
 
-<?php if(isset($result)) echo $result; ?>
-<?php if(!empty($form_errors)) echo show_errors($form_errors); ?>
-<form method="post" action="">
-    <table>
-        <tr><td>Username:</td> <td><input type="text" value="" name="username"></td></tr>
-        <tr><td>Password:</td> <td><input type="password" value="" name="password"></td></tr>
-        <tr><td></a></td><td><input style="float: right;" type="submit" name="loginBtn" value="Entrar"></td></tr>
-    </table>
-</form>
-<p><a href="index.php">Regresar</a> </p>
+
+<section class="ftco-section singin-section bg-light">
+    <div class="container">
+        <div class="row block-10">
+            <div class="mx-auto col-md-4 order-md-last d-flex">
+                <form method="POST" action="" class="bg-white p-5 form-sigin">
+                     <div class="form-group">
+                         <input name= "email" type="email" id="inputEmail" class="form-control" placeholder="Email" required autofocus>
+                    </div>
+                    <div class="form-group">
+                        <input name="password" type="password" id="inputPassword" class="form-control" placeholder="Password" required>
+                    </div>
+                    <div class="checkbox mb-3">
+                        <label>
+                            <input type="checkbox" value="remember-me"> Recuerdame
+                        </label>
+                    </div>
+                    <button class="btn btn-lg btn-primary btn-block" name="loginBtn" type="submit">Login</button>
+                    <div class="mt-4">
+                        <div class="d-flex justify-content-center links">
+                            ¿No tienes cuenta? <a href="#" class="ml-2">Registrarme  <br> <br> </a>
+                        </div>
+                        <div class="d-flex justify-content-center links">
+                            <span class="icon-key">
+                            <a href="#">¿Olvidaste tú Password?<br> <br> </a>
+                        </div>
+                        <div class="d-flex justify-content-center links">
+                            <span class="icon-envelope">
+                            <a href="#">¿Deseas validar tu email?<br> <br> </a>
+                        </div>
+                        <div class="d-flex justify-content-center links">
+                            <span class="icon-phone2">
+                            <a href="#">¿Deseas validar tu móvil?<br> <br> </a>
+                        </div>
+                    </div>
+               </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<?php include_once 'include/pie.php'; ?>
+
 </body>
 </html>
-
